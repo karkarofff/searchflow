@@ -1,0 +1,23 @@
+[package]
+name = "searchflow"
+version = "0.5.0"
+description = "A Tauri App"
+authors = ["you"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+unicode-normalization = "0.1"
+aho-corasick = "1"
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+walkdir = "2.5.0"
+pdf-extract = "0.10.0"
+docx-rs = "0.4.20"
+regex = "1.12.3"
+rayon = "1.12.0"

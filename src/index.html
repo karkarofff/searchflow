@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SearchFlow</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+
+      <!-- HEADER -->
+      <div class="header">
+        <div class="header-left">
+          <img src="./icon.png" class="logo-img" alt="SearchFlow logo">
+          <div>
+            <h1>SearchFlow</h1>
+            <p class="subtitle">Recherche puissante dans vos fichiers</p>
+          </div>
+        </div>
+        <div class="header-right">
+          <button id="about-btn" class="btn-help">ℹ️ À propos</button>
+          <button id="help-btn" class="btn-help">❓ Aide</button>
+          <div class="version">v0.5</div>
+        </div>
+      </div>
+
+      <!-- PANNEAU DE RECHERCHE -->
+      <div class="search-panel">
+
+        <!-- Zone drag & drop dossier -->
+        <div class="field-group">
+          <label>Dossier à analyser</label>
+          <div class="input-row">
+            <div id="drop-zone" class="drop-zone">
+              <span id="drop-zone-text">📂 Glissez un dossier ici ou cliquez sur Parcourir</span>
+              <span id="drop-zone-path" style="display:none;"></span>
+            </div>
+            <button id="folder-btn" class="btn-secondary">Parcourir</button>
+          </div>
+        </div>
+
+        <!-- Recherche -->
+        <div class="field-group">
+          <label>Recherche</label>
+          <div class="input-row">
+            <input type="text" id="search-query" placeholder="Ex: jean dupont, facture 2024..." autocomplete="off" autocorrect="off" spellcheck="false" />
+            <select id="search-mode">
+              <option value="ET">Contient tous les mots</option>
+              <option value="OU">Contient au moins un mot</option>
+              <option value="EXACT">Contient la phrase exacte</option>
+              <option value="REGEX">Recherche avancée (regex)</option>
+            </select>
+            <button id="search-btn" class="btn-primary">🔍 Rechercher</button>
+            <button id="stop-btn" class="btn-stop" style="display:none;">⏹️ Stop</button>
+          </div>
+        </div>
+
+        <!-- Options -->
+        <div class="field-group">
+          <label>Options</label>
+          <div class="options-row">
+            <label class="option-check">
+              <input type="checkbox" id="case-sensitive">
+              <span>Respecter la casse (A ≠ a)</span>
+            </label>
+            <label class="option-check">
+              <input type="checkbox" id="ignore-accents">
+              <span>Ignorer les accents (é = e)</span>
+            </label>
+            <label class="option-check">
+              <input type="checkbox" id="search-subdirs" checked>
+              <span>Inclure les sous-dossiers</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Types de fichiers -->
+        <div class="field-group">
+          <div class="extensions-header">
+            <label>Types de fichiers</label>
+            <label class="toggle-switch-ext">
+              <span id="ext-toggle-label">Tout cocher</span>
+              <input type="checkbox" id="ext-toggle" checked>
+              <span class="toggle-slider-ext"></span>
+            </label>
+          </div>
+          <div class="extensions-row">
+            <label class="ext-checkbox"><input type="checkbox" value="txt" checked> .txt</label>
+            <label class="ext-checkbox"><input type="checkbox" value="log" checked> .log</label>
+            <label class="ext-checkbox"><input type="checkbox" value="csv" checked> .csv</label>
+            <label class="ext-checkbox"><input type="checkbox" value="md" checked> .md</label>
+            <label class="ext-checkbox"><input type="checkbox" value="json" checked> .json</label>
+            <label class="ext-checkbox"><input type="checkbox" value="xml" checked> .xml</label>
+            <label class="ext-checkbox"><input type="checkbox" value="ini" checked> .ini</label>
+            <label class="ext-checkbox"><input type="checkbox" value="cfg" checked> .cfg</label>
+            <label class="ext-checkbox"><input type="checkbox" value="bat" checked> .bat</label>
+            <label class="ext-checkbox"><input type="checkbox" value="ps1" checked> .ps1</label>
+            <label class="ext-checkbox"><input type="checkbox" value="pdf" checked> .pdf</label>
+            <label class="ext-checkbox"><input type="checkbox" value="docx" checked> .docx</label>
+          </div>
+        </div>
+
+        <!-- Historique -->
+        <div class="field-group" id="history-group" style="display:none;">
+          <label>
+            Recherches récentes
+            <span id="history-toggle-container">
+              <label class="toggle-switch">
+                <input type="checkbox" id="history-toggle" checked>
+                <span class="toggle-slider"></span>
+              </label>
+              <span id="history-toggle-label">Activé</span>
+            </span>
+          </label>
+          <div id="history-container"></div>
+        </div>
+
+        <!-- Aide modes -->
+        <div class="mode-help">
+          <span class="help-tag">ET</span> jean dupont → trouve les lignes contenant <b>jean</b> ET <b>dupont</b> peu importe l'ordre
+          &nbsp;·&nbsp;
+          <span class="help-tag">OU</span> trouve l'un ou l'autre
+          &nbsp;·&nbsp;
+          <span class="help-tag">EXACT</span> trouve la phrase exacte
+          &nbsp;·&nbsp;
+          <span class="help-tag">REGEX</span> mode avancé avec expressions régulières
+        </div>
+
+      </div>
+
+      <!-- BARRE DE PROGRESSION -->
+      <div id="progress-section" style="display:none;">
+        <div class="progress-header">
+          <span id="progress-label">⏳ Analyse en cours...</span>
+          <span id="progress-stats"></span>
+        </div>
+        <div class="progress-bar-bg">
+          <div id="progress-bar" class="progress-bar-fill"></div>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div id="search-stats"></div>
+
+      <!-- CHARGEMENT -->
+      <div id="loading" style="display:none;">
+        <div class="spinner"></div>
+        <span>Recherche en cours...</span>
+      </div>
+
+      <!-- COMPTEUR + EXPORT -->
+      <div id="result-header-row">
+        <div id="result-count"></div>
+        <div id="export-btns" style="display:none;">
+          <button id="export-txt-btn" class="btn-tiny">💾 Exporter TXT</button>
+          <button id="export-csv-btn" class="btn-tiny">📊 Exporter CSV</button>
+        </div>
+      </div>
+
+      <!-- RÉSULTATS -->
+      <div id="results-container"></div>
+
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast"></div>
+
+    <!-- FENETRE AIDE -->
+    <div id="help-overlay" class="help-overlay" style="display:none;">
+      <div class="help-modal">
+        <div class="help-header">
+          <h2>❓ Aide — SearchFlow</h2>
+          <button id="help-close" class="btn-close">✕</button>
+        </div>
+        <div class="help-content">
+
+          <div class="help-section">
+            <h3>🔍 À quoi sert SearchFlow ?</h3>
+            <p>SearchFlow vous permet de rechercher du texte dans tous vos fichiers d'un dossier, rapidement et facilement. Contrairement à la recherche Windows qui cherche uniquement les noms de fichiers, SearchFlow lit l'intérieur de chaque fichier pour trouver exactement ce que vous cherchez.</p>
+          </div>
+
+          <div class="help-section">
+            <h3>📁 Dossier à analyser</h3>
+            <p>Cliquez sur <b>Parcourir</b> pour sélectionner le dossier, ou <b>glissez-déposez</b> directement un dossier depuis l'explorateur Windows dans la zone pointillée. SearchFlow analysera ce dossier et tous ses sous-dossiers automatiquement.</p>
+          </div>
+
+          <div class="help-section">
+            <h3>✏️ Champ de recherche</h3>
+            <p>Tapez le ou les mots que vous recherchez. Vous pouvez appuyer sur <b>Entrée</b> pour lancer la recherche sans cliquer sur le bouton.</p>
+          </div>
+
+          <div class="help-section">
+            <h3>⚙️ Modes de recherche</h3>
+            <p>Le menu à côté du champ de recherche permet de choisir comment SearchFlow interprète ce que vous tapez.</p>
+            <div class="help-mode">
+              <span class="help-tag">Contient tous les mots</span>
+              <p>Le mode le plus utile au quotidien. Il trouve les lignes qui contiennent <b>tous</b> les mots tapés, <b>peu importe l'ordre</b>, et même s'il y a d'autres mots entre eux. Exemple : taper <b>jean dupont</b> trouve aussi bien « Dupont Jean » que « Jean est l'ami de Dupont ».</p>
+            </div>
+            <div class="help-mode">
+              <span class="help-tag">Contient au moins un mot</span>
+              <p>Trouve les lignes qui contiennent <b>au moins un</b> des mots tapés. Pratique quand vous hésitez sur le terme exact : <b>facture devis</b> trouve les lignes avec « facture » <b>ou</b> « devis ».</p>
+            </div>
+            <div class="help-mode">
+              <span class="help-tag">Contient la phrase exacte</span>
+              <p>Trouve les lignes contenant <b>exactement</b> ce que vous avez tapé, dans le <b>même ordre</b>. Exemple : <b>jean dupont</b> ne trouvera que « jean dupont », pas « Dupont Jean ».</p>
+            </div>
+            <div class="help-mode">
+              <span class="help-tag">Recherche avancée (regex)</span>
+              <p>Pour les utilisateurs expérimentés : des motifs avec expressions régulières. Exemple : <b>facture.*2024</b> trouve « facture » suivi de n'importe quoi puis « 2024 ». Si vous ne savez pas ce qu'est une regex, vous n'en avez pas besoin : utilisez un des trois modes ci-dessus.</p>
+            </div>
+          </div>
+
+          <div class="help-section">
+            <h3>🔧 Options</h3>
+            <p><b>Respecter la casse</b> — si activé, « Jean » et « jean » sont considérés comme différents. Par défaut (case décochée), la recherche ignore les majuscules/minuscules.</p>
+            <p style="margin-top:8px;"><b>Ignorer les accents</b> — si activé, les lettres accentuées sont traitées comme leur version simple : « e », « é », « è », « ê » deviennent équivalents, tout comme « c » et « ç ». Concrètement, taper <b>jerome</b> trouvera aussi « Jérôme », et <b>francois</b> trouvera « François ». Très pratique pour chercher un nom sans se soucier des accents. Laissez la case décochée pour une recherche stricte (c'est aussi un peu plus rapide).</p>
+            <p style="margin-top:8px;"><b>Inclure les sous-dossiers</b> — si activé, SearchFlow parcourt aussi tous les sous-dossiers du dossier sélectionné.</p>
+          </div>
+
+          <div class="help-section">
+            <h3>📄 Types de fichiers</h3>
+            <p>Utilisez le toggle pour tout cocher ou tout décocher. Vous pouvez aussi cocher ou décocher manuellement chaque extension. Décocher des types inutiles accélère la recherche.</p>
+          </div>
+
+          <div class="help-section">
+            <h3>📊 Barre de progression</h3>
+            <p>Pendant la recherche, une barre de progression s'affiche avec le nombre de fichiers analysés en temps réel et le nombre de résultats trouvés jusqu'à présent.</p>
+          </div>
+
+          <div class="help-section">
+            <h3>📋 Résultats</h3>
+            <p>Chaque résultat affiche le nom du fichier, son chemin complet, le numéro de ligne et le contenu de la ligne avec les mots recherchés surlignés en orange.</p>
+            <p style="margin-top:8px;"><b>Clic gauche</b> sur un résultat → copie le chemin du fichier.</p>
+            <p style="margin-top:4px;"><b>Clic droit</b> sur un résultat → menu avec options :</p>
+            <ul style="margin-top:6px; margin-left:20px;">
+              <li><b>Ouvrir le fichier</b> — ouvre le fichier avec son application par défaut</li>
+              <li><b>Ouvrir le dossier contenant</b> — ouvre l'explorateur Windows à l'emplacement du fichier</li>
+              <li><b>Copier le chemin</b> — copie le chemin complet dans le presse-papier</li>
+            </ul>
+          </div>
+
+          <div class="help-section">
+            <h3>💾 Export des résultats</h3>
+            <p>Après une recherche, cochez les résultats que vous souhaitez exporter puis cliquez sur <b>Exporter TXT</b> ou <b>Exporter CSV</b>. Une fenêtre s'ouvre pour choisir où sauvegarder le fichier. Le fichier CSV peut être ouvert directement dans Excel.</p>
+          </div>
+
+          <div class="help-section">
+            <h3>⏱️ Historique</h3>
+            <p>SearchFlow mémorise vos 10 dernières recherches. Cliquez sur une recherche récente pour la relancer automatiquement. Vous pouvez désactiver l'historique ou supprimer des entrées individuellement.</p>
+          </div>
+
+          <div class="help-section">
+            <h3>⚠️ Avertissement fichiers volumineux</h3>
+            <p>Si vous tentez d'ouvrir un fichier de plus de 50 Mo, SearchFlow vous avertit avant de l'ouvrir pour éviter tout ralentissement de votre PC.</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- FENETRE A PROPOS -->
+    <div id="about-overlay" class="help-overlay" style="display:none;">
+      <div class="help-modal about-modal">
+        <div class="help-header">
+          <h2>ℹ️ À propos</h2>
+          <button id="about-close" class="btn-close">✕</button>
+        </div>
+        <div class="help-content about-content">
+          <img src="./icon.png" class="about-logo" alt="SearchFlow logo">
+          <h3 class="about-name">SearchFlow</h3>
+          <p class="about-version">Version 0.5</p>
+          <p class="about-desc">
+            Recherche de texte à l'intérieur de vos fichiers, même les très volumineux.
+            Rapide, simple, et 100 % local : aucune donnée n'est envoyée sur Internet.
+          </p>
+          <div class="about-author">
+            <span class="about-label">Développé par</span>
+            <span class="about-pseudo">karkarofff</span>
+          </div>
+          <button id="about-github" class="btn-help about-github-btn">🔗 Voir sur GitHub</button>
+          <p class="about-foot">© 2026 karkarofff · Tous droits réservés</p>
+        </div>
+      </div>
+    </div>
+
+    <script src="main.js"></script>
+  </body>
+</html>

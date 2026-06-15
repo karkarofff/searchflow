@@ -1,0 +1,24 @@
+# Dependances Node (se reinstallent avec "npm install")
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Artefacts de compilation Rust / Tauri (se regenerent avec "tauri build")
+src-tauri/target/
+
+# Sorties de build frontend eventuelles
+dist/
+build/
+
+# Fichiers systeme / editeur
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+*.log
+
+# Fichiers d'environnement / secrets (au cas ou)
+.env
+.env.local
