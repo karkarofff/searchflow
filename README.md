@@ -36,12 +36,7 @@ plusieurs Go) sans saturer la mémoire ni planter.
 
 ## Captures d'écran
 
-> A ajouter : déposez ici une ou deux captures de l'application
-> (par exemple `docs/screenshot.png`) puis référencez-les ci-dessous.
-
-```
-![SearchFlow](docs/screenshot.png)
-```
+![SearchFlow](screenshot.png)
 
 ---
 
